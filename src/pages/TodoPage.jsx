@@ -4,28 +4,28 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ListItem from '../components/ListItem';
 import {
-	addTodo,
-	fetchTodos,
-	removeTodoThunk,
-	toggleComplete,
+    addTodoThunk,
+    fetchTodos,
+    removeTodoThunk,
+    toggleStatusThunk,
 } from '../store/todoSlice';
 
 const TodoPage = () => {
 	const [title, setTitle] = useState('');
 	const dispatch = useDispatch();
 
-	const { todos, status, error, removingStatus, removingError } = useSelector(
+	const { todos, status, error, removingStatus, removingError, addStatus, addError, toggleStatus, toggleError } = useSelector(
 		state => state.todo
 	);
 
 	const onAddTodo = () => {
-		dispatch(addTodo({ title }));
+		dispatch(addTodoThunk(title));
 	};
 	const onRemoveTodo = id => {
 		dispatch(removeTodoThunk(id));
 	};
 	const onChangeCheckbox = id => {
-		dispatch(toggleComplete({ id }));
+		dispatch(toggleStatusThunk(id));
 	};
 	useEffect(() => {
 		dispatch(fetchTodos());
@@ -40,11 +40,14 @@ const TodoPage = () => {
 					onChange={e => setTitle(e.target.value)}
 				/>
 				<button onClick={onAddTodo}>Add</button>
+                {addStatus === 'loading' && <span>Loading</span>}
+                {addStatus === 'error' && <span>{addError}</span>}
 			</div>
 			{status === 'loading' && <p>Loading...</p>}
 			{status === 'error' && (
 				<p>Error occurred during fetch todos with status: {error}</p>
 			)}
+            {toggleStatus === 'error' && <span>{toggleError}</span>}
 			{status === 'ok' && (
 				<ul>
 					{todos.map(todo => (
